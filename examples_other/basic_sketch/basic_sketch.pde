@@ -2,7 +2,7 @@ color c1;
 color c2;
 
 void settings() {
-  fnpSize(500, 500, P2D); // <-- Use this line to replace the typical size() function
+  fnpSize(555, 555, P2D); // <-- Use this line to replace the typical size() function
   //fullScreen(P2D);
   smooth(8);
 }

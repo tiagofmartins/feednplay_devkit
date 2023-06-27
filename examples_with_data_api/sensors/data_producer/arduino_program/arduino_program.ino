@@ -10,6 +10,6 @@ void loop() {
   Serial.print("p");
   Serial.print(analogRead(PIN_POT));
   Serial.print(" b");
-  Serial.println(digitalRead(PIN_BUTTON));
+  Serial.println(digitalRead(PIN_BUTTON) == LOW);
   delay(100);
 }

@@ -68,7 +68,7 @@ while True:
 
         if piece.startswith("b"):
             if dp.topic_subscrived(TOPIC_1) or dp.topic_subscrived(TOPIC_2):
-                button_is_pressed = int(piece[1:]) == 0
+                button_is_pressed = int(piece[1:]) == 1
                 if button_is_pressed:
                     time_last_button_press = time.time()
                 if dp.topic_subscrived(TOPIC_1):
