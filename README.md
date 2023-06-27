@@ -26,10 +26,11 @@ void draw() {
 }
 </pre>
 
+## Recommendations
 
-## Loading data in Processing sketches properly
+### Loading data in Processing sketches properly
 
-If your Processing sketch needs to load files or any data at startup, we recommend that you don't do it in the `setup()` function as it may take a few seconds and thus trigger a Processing timeout error (_RuntimeException: Waited 5000ms …_). We recommend that you load all the required data in the second drawing frame (not the first). To do this, you can adapt your `draw()` function based on the following code:
+If your Processing sketch needs to load files or any data at startup, we recommend that you don't do it in the `setup()` function as it may take a few seconds and thus trigger a Processing timeout error (_RuntimeException: Waited 5000ms …_). Instead, we recommend that you load all the required data in the second drawing frame (not the first). To do this, you can adapt your `draw()` function based on the following code:
 
 <pre>
 void draw() {
