@@ -8,23 +8,23 @@ To develop a Processing sketch to run in FeedNPlay, one of the following options
 2. Open the [examples_other/simple example/](/examples_other/basic_sketch);
 3. Build your content from it.
 
-<pre>
+```processing
 void settings() {
-  <b>fnpSize(500, 500, P2D);</b> // This line must the first one of settings()
+  fnpSize(500, 500, P2D); // This line must the first one of settings()
   smooth(8);
-  // Insert settings code here
+  // Insert your settings code here
 }
 
 void setup() {
   frameRate(60);
-  // Insert setup code here
-  <b>fnpEndSetup();</b> // This line must the last one of setup()
+  // Insert your setup code here
+  fnpEndSetup(); // This line must the last one of setup()
 }
 
 void draw() {
-  // Insert draw code here
+  // Insert your draw code here
 }
-</pre>
+```
 
 ## Recommendations
 
@@ -32,14 +32,14 @@ void draw() {
 
 If your Processing sketch needs to load files or any data at startup, we recommend that you don't do it in the `setup()` function as it may take a few seconds and thus trigger a Processing timeout error (_RuntimeException: Waited 5000ms …_). Instead, we recommend that you load all the required data in the second drawing frame (not the first). To do this, you can adapt your `draw()` function based on the following code:
 
-<pre>
+```processing
 void draw() {
   if (frameCount <= 2) {
     if (frameCount == 2) {
-      // Insert load code here
+      // Insert your load code here
     }
   } else {
-    // Insert draw code here
+    // Insert your draw code here
   }
 }
-</pre>
+```
