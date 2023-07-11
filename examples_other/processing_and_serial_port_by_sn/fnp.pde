@@ -1,108 +1,130 @@
 /*
- ┌───────────────────────────────┐
- │ FeedNPlay                     │
- │                               │
- └───────────────────────────────┘
- Please DO NOT change any code contained in this tab.
+ ┌──────────────────────────────────────────────────────────┐
+ │ FeedNPlay                                     2023.07.07 │
+ │ Code to enable the automatic display of content.         │
+ │ Please DO NOT change any of the code below.              │
+ │ If you have any suggestions or special requests          │
+ │ please contact the FeedNPlay team. We will be happy      │
+ │ to improve the system for you and all users.             │
+ └──────────────────────────────────────────────────────────┘
  */
 
 import java.util.concurrent.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-final StringDict arguments = new StringDict();
+StringDict fnpArguments = new StringDict();
+boolean fnpRunAutomated = false;
+boolean fnpSizeCalled = false;
+
+void fnpSize(int w, int h, String renderer, boolean undecorated) {
+  assert fnpSizeCalled == false;
+  fnpSizeCalled = true;
+
+  assert renderer.equals(JAVA2D) || renderer.equals(P2D) || renderer.equals(P3D) || renderer.equals(FX2D);
+
+  if (args != null) {
+    fnpRunAutomated = true;
+    for (String arg : args) {
+      String[] param = split(arg, "=");
+      assert param.length == 2;
+      fnpArguments.set(param[0], param[1]);
+    }
+  }
+
+  if (!fnpArguments.hasKey("w")) fnpArguments.set("w", Integer.toString(w));
+  if (!fnpArguments.hasKey("h")) fnpArguments.set("h", Integer.toString(h));
+
+  if (undecorated || fnpRunAutomated) {
+    fullScreen(renderer);
+  } else {
+    size(int(fnpArguments.get("w")), int(fnpArguments.get("h")), renderer);
+  }
+
+  new CustomMethodsHandler(this);
+}
+
+void fnpSize(int x, int y, int w, int h, String renderer, boolean undecorated) {
+  if (!fnpArguments.hasKey("x")) fnpArguments.set("x", Integer.toString(x));
+  if (!fnpArguments.hasKey("y")) fnpArguments.set("y", Integer.toString(y));
+  fnpSize(w, h, renderer, undecorated);
+}
+
+void fnpSize(int x, int y, int w, int h, String renderer) {
+  fnpSize(x, y, w, h, renderer, false);
+}
 
 void fnpSize(int w, int h, String renderer) {
-  assert renderer.endsWith(".PGraphicsJava2D") || renderer.endsWith(".PGraphics2D") || renderer.endsWith(".PGraphics3D");
-  if (args != null) {
-    for (String arg : args) {
-      String[] entry = split(arg, "=");
-      assert entry.length == 2;
-      arguments.set(entry[0], entry[1]);
-    }
-  }
-  if (arguments.hasKey("w") && arguments.hasKey("h")) {
-    size(int(arguments.get("w")), int(arguments.get("h")), renderer);
-  } else {
-    size(w, h, renderer);
-  }
+  fnpSize(w, h, renderer, false);
 }
 
-void fnpSize(int w, int h) {
-  fnpSize(w, h, JAVA2D);
+void fnpFullScreen(String renderer) {
+  fnpSize(0, 0, displayWidth, displayHeight, renderer, true);
 }
 
-void fnpEndSetup() {
-  if (arguments.size() > 0) {
-    if (arguments.hasKey("x") && arguments.hasKey("y")) {
-      surface.setLocation(int(arguments.get("x")), int(arguments.get("y")));
-    }
+// ────────────────────────────────────────────────────────────────────────────────────────────────────
 
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+public class CustomMethodsHandler {
 
-    Runnable periodicPing = new Runnable() {
-      public void run() {
-        System.out.println("ping " + System.currentTimeMillis());
+  private PApplet parent;
+  private long timeLastPing = 0;
+
+  CustomMethodsHandler(PApplet parent) {
+    this.parent = parent;
+    parent.registerMethod("pre", this);
+    parent.registerMethod("dispose", this);
+  }
+
+  void pre() {
+    if (parent.frameCount == 1) {
+      if (fnpArguments.hasKey("x") && fnpArguments.hasKey("y")) {
+        surface.setLocation(int(fnpArguments.get("x")), int(fnpArguments.get("y")));
       }
-    };
-    executor.scheduleAtFixedRate(periodicPing, 0, 5000, TimeUnit.MILLISECONDS);
-
-    if (arguments.hasKey("proxy-dir")) {
-      Runnable checkProxyFiles = new Runnable() {
-        File proxyClose = new File(arguments.get("proxy-dir"), "close");
-        File proxyClosed = new File(arguments.get("proxy-dir"), "closed");
-        public void run() {
-          if (proxyClose.exists()) {
-            try {
-              proxyClosed.createNewFile();
+      if (fnpArguments.hasKey("w") && fnpArguments.hasKey("h")) {
+        surface.setSize(int(fnpArguments.get("w")), int(fnpArguments.get("h")));
+      }
+      if (fnpRunAutomated) {
+        if (fnpArguments.hasKey("proxy-dir")) {
+          Runnable proxyFilesChecker = new Runnable() {
+            File proxyClose = new File(fnpArguments.get("proxy-dir"), "close");
+            File proxyClosed = new File(fnpArguments.get("proxy-dir"), "closed");
+            public void run() {
+              if (proxyClose.exists()) {
+                try {
+                  proxyClosed.createNewFile();
+                }
+                catch (IOException e) {
+                  e.printStackTrace();
+                }
+                exit();
+              }
             }
-            catch (IOException e) {
-              e.printStackTrace();
-            }
-            exit();
-          }
+          };
+          ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+          executor.scheduleAtFixedRate(proxyFilesChecker, 0, 1000, TimeUnit.MILLISECONDS);
         }
-      };
-      executor.scheduleAtFixedRate(checkProxyFiles, 0, 1000, TimeUnit.MILLISECONDS);
+      }
+    }
+    if (fnpRunAutomated && System.currentTimeMillis() - timeLastPing >= 5000) {
+      timeLastPing = System.currentTimeMillis();
+      System.out.println("ping " + timeLastPing);
     }
   }
-}
 
-PSurface initSurface() {
-  PSurface ps = super.initSurface();
-  String renderer = getRenderer(this);
-  if (renderer == P2D || renderer == P3D) {
-    com.jogamp.newt.opengl.GLWindow window = (com.jogamp.newt.opengl.GLWindow) surface.getNative();
-    window.setUndecorated(true);
-  } else if (renderer == JAVA2D) {
-    java.awt.Frame frame = ((processing.awt.PSurfaceAWT.SmoothCanvas) ((processing.awt.PSurfaceAWT) surface).getNative()).getFrame();
-    frame.setUndecorated(true);
-  } else {
-    assert false;
-  }
-  //ps.setAlwaysOnTop(true);
-  //ps.hideCursor();
-  return ps;
-}
-
-static String getRenderer(PApplet p) {
-  PGraphics pg  = p.getGraphics();
-  if (pg.isGL()) {
-    if (pg.is3D()) {
-      return P3D;
-    } else {
-      return P2D;
-    }
-  } else {
-    return JAVA2D;
+  void dispose() {
+    // Stop the program when using FX2D renderer
+    // https://github.com/processing/processing4-javafx/issues/2#issuecomment-1101799438
+    exitActual();
   }
 }
 
-String getPortOfArduinoWithSerialNumber(String serialNumber) {
+// ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+String getArduinoPortBySerialNumber(String serialNumber) {
   StringDict arduinoPorts = getArduinoSerialPorts();
-  for (String currSerialNumber : arduinoPorts.keys()) {
-    if (currSerialNumber.equals(serialNumber)) {
-      return arduinoPorts.get(currSerialNumber);
+  for (String sn : arduinoPorts.keys()) {
+    if (sn.equals(serialNumber)) {
+      return arduinoPorts.get(sn);
     }
   }
   return null;
@@ -161,4 +183,13 @@ StringDict getArduinoSerialPorts() {
 
   // Return result
   return arduinoPorts;
+}
+
+String getStringWithArduinoSerialPorts() {
+  String output = "";
+  StringDict arduinoPorts = getArduinoSerialPorts();
+  for (String sn : arduinoPorts.keys()) {
+    output += "[" + sn + "] " + arduinoPorts.get(sn) + "\n";
+  }
+  return !output.isEmpty() ? output.strip() : "none";
 }

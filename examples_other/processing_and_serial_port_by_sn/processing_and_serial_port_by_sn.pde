@@ -1,34 +1,36 @@
 import processing.serial.*;
 
-/*
-How to find the serial number of your Arduino board?
- 1. Open the Arduino IDE
- 2. Make sure the correct board is selected
- 3. Go to the menu Tools
- 4. Select the option Get Board Info
- 5. Copy the serial number and use it here
- */
-
-String boardSerialNumber = "TODO";
+String arduinoSerialNumber = "85036313530351304291";
 Serial port;
+String dataReceived = "";
 
 void settings() {
-  fnpSize(555, 555, P2D);
+  fnpSize(444, 222, P2D);
   smooth(8);
 }
 
 void setup() {
-  String portName = getPortOfArduinoWithSerialNumber(boardSerialNumber);
+  String portName = getArduinoPortBySerialNumber(arduinoSerialNumber);
   if (portName == null) {
-    println("Port with serial number " + boardSerialNumber + " not found");
+    println("Port of device with serial number " + arduinoSerialNumber + " not found");
+    println("Available ports:\n" + getStringWithArduinoSerialPorts());
     exit();
     return;
   }
+  println("Connecting serial port " + portName);
   port = new Serial(this, portName, 9600);
-  // Insert your code here
-  fnpEndSetup();
 }
 
 void draw() {
-  // Insert your code here
+  if (port.available() > 0) {
+    String newData = port.readStringUntil('\n');
+    if (newData != null) {
+      dataReceived = newData;
+    }
+  }
+  
+  background(0);
+  fill(255);
+  textSize(40);
+  text(dataReceived, 30, 60);
 }
