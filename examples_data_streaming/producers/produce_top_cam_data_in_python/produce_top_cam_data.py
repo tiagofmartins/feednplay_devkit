@@ -107,6 +107,7 @@ else:
 # --------------------------------------------------
 # Start capturing
 
+print('Capture started')
 try:
     while capture.isOpened():
 

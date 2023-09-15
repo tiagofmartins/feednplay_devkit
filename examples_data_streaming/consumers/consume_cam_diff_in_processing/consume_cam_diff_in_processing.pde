@@ -15,12 +15,11 @@ void draw() {
   
   JSONObject json = r.getValueAsJSON("roi_diff_90cols");
   if (json != null) {
-    int[][] entireMatrix = getVerticalRegion(json, 1, 0);
-    //int[][] subMatrix = getVerticalRegion(json, 9, 8);
-    int[][] subMatrix = getVerticalRegion(json, 0.5, 0.75);
-
+    int[][] entireMatrix = getVerticalRegion(json, 0, 1);
     drawMatrix(entireMatrix, 4);
-
+    
+    //int[][] subMatrix = getVerticalRegion(json, 0.5, 0.75);
+    int[][] subMatrix = getVerticalSlice(json, 9, 8);
     pushMatrix();
     translate(mouseX, mouseY);
     drawMatrix(subMatrix, 4);
@@ -51,7 +50,7 @@ int[][] getVerticalRegion(JSONObject matrixData, float leftLimit, float rightLim
   return subMatrix;
 }
 
-int[][] getVerticalRegion(JSONObject matrixData, int slices, int indexSlice) {
+int[][] getVerticalSlice(JSONObject matrixData, int slices, int indexSlice) {
   int matrixW = matrixData.getInt("w");
   int matrixH = matrixData.getInt("h");
   JSONArray matrix = matrixData.getJSONArray("matrix");
