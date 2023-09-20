@@ -13,7 +13,7 @@ void setup() {
 void draw() {
   background(128);
   
-  JSONObject json = r.getValueAsJSON("roi_diff_90cols");
+  JSONObject json = r.getValueAsJSON();
   if (json != null) {
     int[][] entireMatrix = getVerticalRegion(json, 0, 1);
     drawMatrix(entireMatrix, 4);
@@ -73,7 +73,7 @@ int[][] getVerticalSlice(JSONObject matrixData, int slices, int indexSlice) {
   return subMatrix;
 }
 
-void drawMatrix(int[][] matrix, int cellSize) {
+void drawMatrix(int[][] matrix, float cellSize) {
   noStroke();
   for (int row = 0; row < matrix.length; row++) {
     for (int col = 0; col < matrix[row].length; col++) {

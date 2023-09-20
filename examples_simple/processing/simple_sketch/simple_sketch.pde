@@ -1,5 +1,7 @@
 void settings() {
-  fnpSize(100, 100, 333, 555, P2D, true);
+  fnpSize(333, 555, P2D);
+  //fnpSize(100, 100, 333, 555, P2D, true);
+  //fnpFullScreen(P2D);
   smooth(8);
 }
 
