@@ -58,7 +58,7 @@ class FnpDataReader implements Runnable {
     for (int t = 0; t < topics.length; t++) {
 
       // Check if this topic expects values which are images
-      expectImage[t] = topics[t].startsWith("image_");
+      expectImage[t] = topics[t].contains("_rgb_") || topics[t].contains("_grayscale_");
 
       // Create Kafka consumer
       Properties props = new Properties();
