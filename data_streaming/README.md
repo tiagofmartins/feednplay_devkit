@@ -28,7 +28,7 @@ python -m pip install confluent-kafka opencv-python pyserial
 1. Open Docker Desktop application
 2. Delete existing containers, images and volumes in the Docker Desktop application
 3. Open terminal
-4. Move to the directory that contains the file [`docker-compose.yaml`](other_file.md). For example, if you downloaded this repository to the folder `/Users/YourName/Downloads` you should run the following command line:
+4. Move to the directory that contains the file [`docker-compose.yaml`](docker-compose.yaml). For example, if you downloaded this repository to the folder `/Users/YourName/Downloads` you should run the following command line:
 ```console
 cd /Users/YourName/Downloads/feednplay_devkit/data_streaming
 ```
@@ -38,101 +38,3 @@ docker compose up --build
 ```
 5. Execute producer(s) program(s)
 6. Execute consumer(s) program(s)
-
-```markdown
-# H1
-## H2
-### H3
-#### H4
-##### H5
-###### H6
-```
-
-### Text
-
-```markdown
-_italic_ or *italic*
-
-**bold** or __bold__
-
-~~strikethrough~~
-```
-
-### Blockquotes
-
-```markdown
-> This is a blockquote
-```
-
-### Horizontal Rule
-
-```markdown
----
-
-***
-
-___
-```
-
-### Lists
-
-```markdown
-1. Ordered list
-2. ...
-
-- Unordered list
-* With *
-+ With +
-```
-
-### Links
-
-```markdown
-[Inine](https://a.com)
-
-[Inline with title](https://a.com "A title")
-
-[Reference][1]
-
-[Link to file](./Docs/SETUP.md)
-
-[1]: https://a.com
-```
-
-### Images
-
-```markdown
-![Inline](https://a.com/logo.png)
-
-![Reference][logo]
-
-[logo]: https://a.com/logo.png
-```
-
-### Code
-
-````markdown
-`Inline code`
-
-```javascript
-const x = 5;
-const plusTwo = a => a + 2;
-```
-````
-
-### Tables
-
-```markdown
-| Column 1      | Column 2      |  Column 3 |
-| ------------- |:-------------:| ---------:|
-| Col 3 is      | right-aligned | $1600     |
-| Col 2 is      | centered      |   $12     |
-| Tables        | are neat      |    $1     |
-```
-
-### HTML
-
-```markdown
-<a href="https://a.com">Link</a>
-<img src="https://a.com/logo.png" width="100">
-```
