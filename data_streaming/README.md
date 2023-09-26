@@ -32,9 +32,9 @@ python -m pip install confluent-kafka opencv-python pyserial
 ```console
 cd /Users/YourName/Downloads/feednplay_devkit/data_streaming
 ```
-4. Start services defined in the `docker-compose.yaml` file by running the following command line:
+5. Start services defined in the `docker-compose.yaml` file by running the following command line:
 ```console
 docker compose up --build
 ```
-5. Execute producer(s) program(s)
-6. Execute consumer(s) program(s)
+6. Execute producer(s) program(s)
+7. Execute consumer(s) program(s)
