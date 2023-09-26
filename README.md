@@ -2,6 +2,10 @@
 
 To develop a Processing sketch to run in FeedNPlay, one of the following options is recommended:
 
+```console
+processing-java --sketch=/path/to/sketch/folder --run x=0 y=0 w=9720 h=1920
+```
+
 ### Option 1
 
 1. Download this repository;
