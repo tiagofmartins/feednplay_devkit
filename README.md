@@ -32,7 +32,7 @@ void draw() {
 ```
 Either way, we think the best approach is to select the code example or template that is most compatible with your idea and and use is as a starting point.
 
-Why not start with the simplest example we have available? Take a look at the example [/examples_processing_sketches/simple sketch01_basic](examples_processing_sketches/simple sketch01_basic).
+Why not start with the simplest example we have available? Take a look at the example [examples_processing_sketches/simple sketch01_basic/](/examples_processing_sketches/simple sketch01_basic).
 
 
 ```console
