@@ -24,6 +24,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu com
 
 The FeedNPlay display consists in a horizonal row of 9 monitors placed side by side and rotated vertically.
 
+![](/images/feednplay-monitors.jpg)
+
 Specifications for the set of monitors:
 
 | Property | Value |
