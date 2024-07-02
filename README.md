@@ -1,35 +1,62 @@
-# FeedNPlay devkit
+FeedNPlay
+=============================
 
-In this repository you can find different examples and code templates that you can use to build new contents to be displayed on [FeedNPlay](https://feednplay.dei.uc.pt).
+**Table of Contents**
+- [What is FeedNPlay?](#what-is-feednplay)
+- [Technical Specifications](#technical-specifications)
+  - [Display](#display)
+  - [Computer](#computer)
 
-Currently, most of the dynamic content displayed on FeedNPlay is implemented in Processing. However, the idea is to expand the repository with more examples, possibly in other programming languages.
+# What is FeedNPlay
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu commodo posuere, ligula ante dictum neque, vitae pharetra mauris mi a velit. Phasellus eleifend egestas diam, id tincidunt arcu dictum quis. Pellentesque eu dui tempus, tempus massa sed, eleifend tortor. Donec in sem in erat iaculis tincidunt. Fusce condimentum hendrerit turpis nec vehicula. Aliquam finibus nisi vel eros lobortis dictum. Etiam congue tortor libero, quis faucibus ligula gravida a. Suspendisse non pulvinar nisl. Sed malesuada, felis vitae consequat gravida, dui ligula suscipit ligula, nec elementum nulla sem vel dolor. Vivamus augue elit, venenatis non lorem in, volutpat placerat turpis. Nullam et libero at eros vulputate auctor. Duis sed pharetra lacus. Sed egestas ligula vitae libero aliquet, ac imperdiet est ullamcorper. Sed dapibus sem tempus eros dignissim, ac suscipit lectus dapibus. Proin sagittis diam vel urna volutpat, vel ullamcorper urna lobortis. Suspendisse potenti.
 
-To automate the launch of each Processing sketch and its positioning on the large screen of FeedNPlay, it is necessary to use a pre-designed code template that follows the following structure:
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu commodo posuere, ligula ante dictum neque, vitae pharetra mauris mi a velit. Phasellus eleifend egestas diam, id tincidunt arcu dictum quis. Pellentesque eu dui tempus, tempus massa sed, eleifend tortor. Donec in sem in erat iaculis tincidunt. Fusce condimentum hendrerit turpis nec vehicula. Aliquam finibus nisi vel eros lobortis dictum. Etiam congue tortor libero, quis faucibus ligula gravida a. Suspendisse non pulvinar nisl. Sed malesuada, felis vitae consequat gravida, dui ligula suscipit ligula, nec elementum nulla sem vel dolor. Vivamus augue elit, venenatis non lorem in, volutpat placerat turpis. Nullam et libero at eros vulputate auctor. Duis sed pharetra lacus. Sed egestas ligula vitae libero aliquet, ac imperdiet est ullamcorper. Sed dapibus sem tempus eros dignissim, ac suscipit lectus dapibus. Proin sagittis diam vel urna volutpat, vel ullamcorper urna lobortis. Suspendisse potenti.
 
-```processing
-void settings() {
-  fnpSize(500, 500, P2D); // This line must the first one of settings()
-  smooth(8);
-  // ...
-}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu commodo posuere, ligula ante dictum neque, vitae pharetra mauris mi a velit. Phasellus eleifend egestas diam, id tincidunt arcu dictum quis. Pellentesque eu dui tempus, tempus massa sed, eleifend tortor. Donec in sem in erat iaculis tincidunt. Fusce condimentum hendrerit turpis nec vehicula. Aliquam finibus nisi vel eros lobortis dictum. Etiam congue tortor libero, quis faucibus ligula gravida a. Suspendisse non pulvinar nisl. Sed malesuada, felis vitae consequat gravida, dui ligula suscipit ligula, nec elementum nulla sem vel dolor. Vivamus augue elit, venenatis non lorem in, volutpat placerat turpis. Nullam et libero at eros vulputate auctor. Duis sed pharetra lacus. Sed egestas ligula vitae libero aliquet, ac imperdiet est ullamcorper. Sed dapibus sem tempus eros dignissim, ac suscipit lectus dapibus. Proin sagittis diam vel urna volutpat, vel ullamcorper urna lobortis. Suspendisse potenti.
 
-void setup() {
-  // Do not use the width and height variables in the setup()
-  // because the window size may change during its positioning
-  frameRate(60);
-  // ...
-}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu commodo posuere, ligula ante dictum neque, vitae pharetra mauris mi a velit. Phasellus eleifend egestas diam, id tincidunt arcu dictum quis. Pellentesque eu dui tempus, tempus massa sed, eleifend tortor. Donec in sem in erat iaculis tincidunt. Fusce condimentum hendrerit turpis nec vehicula. Aliquam finibus nisi vel eros lobortis dictum. Etiam congue tortor libero, quis faucibus ligula gravida a. Suspendisse non pulvinar nisl. Sed malesuada, felis vitae consequat gravida, dui ligula suscipit ligula, nec elementum nulla sem vel dolor. Vivamus augue elit, venenatis non lorem in, volutpat placerat turpis. Nullam et libero at eros vulputate auctor. Duis sed pharetra lacus. Sed egestas ligula vitae libero aliquet, ac imperdiet est ullamcorper. Sed dapibus sem tempus eros dignissim, ac suscipit lectus dapibus. Proin sagittis diam vel urna volutpat, vel ullamcorper urna lobortis. Suspendisse potenti.
 
-void draw() {
-  if (frameCount == 2) {
-    // Load files or data here if needed,
-    // otherwise you can remove this condition
-  } else {
-    background(0);
-    // ...
-  }
-}
-```
-Either way, we think the best approach is to select the code example or template that is most compatible with your idea and and use is as a starting point.
+# Technical Specifications
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dictum, nibh eu commodo posuere, ligula ante dictum neque, vitae pharetra mauris mi a velit. Phasellus eleifend egestas diam, id tincidunt arcu dictum quis. Pellentesque eu dui tempus, tempus massa sed, eleifend tortor. Donec in sem in erat iaculis tincidunt. Fusce condimentum hendrerit turpis nec vehicula. Aliquam finibus nisi vel eros lobortis dictum. Etiam congue tortor libero, quis faucibus ligula gravida a. Suspendisse non pulvinar nisl. Sed malesuada, felis vitae consequat gravida, dui ligula suscipit ligula, nec elementum nulla sem vel dolor. Vivamus augue elit, venenatis non lorem in, volutpat placerat turpis. Nullam et libero at eros vulputate auctor. Duis sed pharetra lacus. Sed egestas ligula vitae libero aliquet, ac imperdiet est ullamcorper. Sed dapibus sem tempus eros dignissim, ac suscipit lectus dapibus. Proin sagittis diam vel urna volutpat, vel ullamcorper urna lobortis. Suspendisse potenti.
 
-Why not start with the simplest example we have available? Take a look at the example  [`/examples_processing_sketches/sketch01_basic`](/examples_processing_sketches/sketch01_basic)
+
+### Display
+
+The FeedNPlay display consists in a horizonal row of 9 monitors placed side by side and rotated vertically.
+
+![](/images/feednplay-monitors.jpg)
+
+Specifications for the set of monitors:
+
+| Property | Value |
+| :--- | :--- |
+| Total resolution | 9720 ✕ 1920 pixels (horizontal ✕ vertical) |
+| Total dimension | 6.12 ✕ 1.21 meters (horizontal ✕ vertical) |
+
+Specifications of each monitor:
+
+| Property | Value |
+| :--- | :--- |
+| Model | NEC MultiSync UN552VS |
+| Panel technology | S-IPS with Direct LED backlights |
+| Panel refresh rate | 60 Hz |
+| Resolution | 1080 ✕ 1920 pixels (horizontal ✕ vertical) |
+| Dimension | 0.68 ✕ 1.21 meters (horizontal ✕ vertical) |
+
+### Computer
+
+| Component | Model |
+| :--- | :--- |
+| CPU | 1✕ Intel Core i9 12900K 16-Core (3.2GHz-5.2GHz) 30MB Skt1700 |
+| GPU | 1✕ Asus ROG Strix GeForce RTX 3080 Ti OC Edition 12GB GDDR6X |
+| RAM | 2✕ Kingston 16GB FURY Beast DDR5 5600MHz CL40 (2✕16GB = 32GB total) |
+| Storage | 1✕ Kingston NVMe M.2 SSD 2TB KC3000 PCIe 4.0 |
+| Motherboard | 1✕ ROG MAXIMUS Z690 HERO |
+| PSU | 1✕ Corsair RMx Series RM1000x 80+ Gold Full Modular |
+
+### Other specs
+
+| Component | Model |
+| :--- | :--- |
+| Matrox | 3✕ QuadHead2Go Q155 HDMI |
+| HDMI | 9✕ WyreStorm Express HDMI CL3 Cable with 4K support (15 meters) |
