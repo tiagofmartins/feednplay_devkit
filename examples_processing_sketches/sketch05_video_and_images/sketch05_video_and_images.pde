@@ -3,6 +3,7 @@ FnpMedia[] media;
 void settings() {
   fnpSize(972, 192, P2D);
   //fnpFullScreen(P2D);
+  smooth(8);
 }
 
 void setup() {

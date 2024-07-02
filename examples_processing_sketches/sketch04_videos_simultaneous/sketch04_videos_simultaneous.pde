@@ -8,6 +8,7 @@ FnpVid[] videos;
 void settings() {
   fnpSize(777, 777, P2D);
   //fnpFullScreen(P2D);
+  smooth(8);
 }
 
 void setup() {

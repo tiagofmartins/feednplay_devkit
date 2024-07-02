@@ -4,7 +4,8 @@ FnpMedia media;
 
 void settings() {
   fnpSize(444, 777, P2D);
-
+  smooth(8);
+  
   // Allow the video path to be passed by argument.
   // This only has an effect when the sketch is executed from the command line.
   if (fnpArguments.hasKey("video")) {

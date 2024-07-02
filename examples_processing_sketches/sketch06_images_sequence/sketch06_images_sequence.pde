@@ -5,6 +5,7 @@ int indexCurrFile = 0;
 void settings() {
   fnpSize(777, 555, P2D);
   //fnpFullScreen(P2D);
+  smooth(8);
 }
 
 void setup() {
