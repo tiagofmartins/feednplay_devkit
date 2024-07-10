@@ -80,7 +80,9 @@ class DataReceiver {
 
     // Send data request
     checkConnection();
-    client.write(this.id + "\n");
+    //client.write(this.id + "\n");
+    client.write(this.id);
+    client.write('\n');
     waitingResponseSince = System.currentTimeMillis();
   }
 
@@ -105,7 +107,11 @@ class DataReceiver {
         } else if (dataClass == JSONObject.class) {
           data = ByteUtils.bytesToJSONObject(client.readBytes());
         } else if (dataClass == PImage.class) {
-          data = ByteUtils.bytesToPImage(client.readBytes());
+          //data = ByteUtils.bytesToPImage(bytes);
+          PImage dataTemp = ByteUtils.bytesToPImage2(parent, client.readBytes(), 1);
+          if (dataTemp != null) {
+            data =  dataTemp;
+          }
         } else {
           data = client.readString();
         }
@@ -152,7 +158,7 @@ static class ByteUtils {
   static byte[] intToBytes(int value) {
     return new byte[] {(byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value};
   }
-  
+
   // Convert float to byte[]
   static byte[] floatToBytes(float value) {
     int intBits = Float.floatToIntBits(value);
@@ -225,6 +231,40 @@ static class ByteUtils {
     catch (IOException e) {
       e.printStackTrace();
     }
+    return img;
+  }
+
+  static PImage bytesToPImage2(PApplet parent, byte[] bytes, int channels) {
+    //System.gc();
+
+    assert channels == 1 || channels == 3;
+
+    int imgWidth = (bytes[0] << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
+    int imgHeight = (bytes[4] << 24) | ((bytes[5] & 0xFF) << 16) | ((bytes[6] & 0xFF) << 8) | (bytes[7] & 0xFF);
+    int bytesHeader = 8;
+    int bytesExpected = bytesHeader + imgWidth * imgHeight * channels;
+    if (bytesExpected != bytes.length) {
+      return null;
+    }
+
+    PImage img = parent.createImage(imgWidth, imgHeight, channels == 3 ? RGB : ALPHA);
+    
+    if (channels == 3) {
+      int r, g, b;
+      for (int i = 0; i < img.pixels.length; i++) {
+        r = bytes[8 + i * channels + 0] & 0xFF;
+        g = bytes[8 + i * channels + 1] & 0xFF;
+        b = bytes[8 + i * channels + 2] & 0xFF;
+        img.pixels[i] = 0xff000000 | (r << 16) | (g << 8) | b;
+      }
+    } else {
+      int grey;
+      for (int i = 0; i < img.pixels.length; i++) {
+        grey = bytes[8 + i] & 0xFF;
+        img.pixels[i] = 0xff000000 | (grey << 16) | (grey << 8) | grey;
+      }
+    }
+    img.updatePixels();
     return img;
   }
 }

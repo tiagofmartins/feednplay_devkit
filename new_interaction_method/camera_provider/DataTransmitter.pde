@@ -6,8 +6,7 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
-final String HOST = "127.0.0.1";
-final int PORT = 23000;
+
 
 class DataTransmitter {
   // https://github.com/processing/processing/tree/459853d0dcdf1e1648b1049d3fdbb4bf233fded8/java/libraries/net/src/processing/net
@@ -16,15 +15,15 @@ class DataTransmitter {
   private Map<String, ArrayList<Client>> clientsByTopic = new HashMap<String, ArrayList<Client>>();
   public int requestsReceived = 0;
   public int requestsReplied = 0;
-  private CameraInput cameraInput;
+  private TopCamera topCamera;
 
-  DataTransmitter(PApplet parent) {
-    server = new Server(parent, PORT);
-    cameraInput = new CameraInput(parent);
+  DataTransmitter(PApplet parent, int port, boolean makeUpData) {
+    server = new Server(parent, port);
+    topCamera = new TopCamera(parent, makeUpData);
   }
 
   public void run() {
-    cameraInput.run();
+    topCamera.run();
     processIncomingRequests();
     replyToRequests();
   }
@@ -60,13 +59,6 @@ class DataTransmitter {
   }
 
   private void replyToRequests() {
-
-
-    // Remova o elemento se o valor for menor que 3
-    /*if (entry.getValue().size() < 3) {
-     iterator.remove();
-     }*/
-
     // Iterate through each requested topic
     //for (Map.Entry e : clientsByTopic.entrySet()) {
     Iterator<Map.Entry<String, ArrayList<Client>>> iterator = clientsByTopic.entrySet().iterator();
@@ -87,14 +79,18 @@ class DataTransmitter {
         json.setInt("age", int(random(1000)));
         data = JSONObjectToBytes(json);
       } else if (topic.equals("IMG_CAMTOP_RGB_720H")) {
-        PImage img = cameraInput.getLastFrame();
+        println(frameCount + " ----- IMG_CAMTOP_RGB_720H");
+        PImage img = topCamera.getLastFrame();
         if (img != null) {
-          data = PImageToBytes(img);
+          //data = PImageToBytes(img);
+          data = PImageToBytes2(img, 1);
         }
       } else {
         println("Error: Unknown topic (" + topic + ")");
       }
-      
+
+      // If data is not null, send it to the clients who requested it
+      // and remove them from the waiting queue
       if (data != null) {
         for (Client c : clients) {
           if (c.active()) {
@@ -104,18 +100,6 @@ class DataTransmitter {
         }
         iterator.remove();
       }
-
-      // If data is not null, send it to the clients who requested it
-      // and remove them from the waiting queue
-      /*if (data != null) {
-        ArrayList<Client> clientsWaiting = clientsByTopic.remove(topic);
-        for (Client c : clientsWaiting) {
-          if (c.active()) {
-            c.write(data);
-            requestsReplied += 1;
-          }
-        }
-      }*/
     }
   }
 }
@@ -130,38 +114,4 @@ protected String getSaltString() {
   }
   String saltStr = salt.toString();
   return saltStr;
-}
-
-
-
-
-
-byte[] intToBytes(int value) {
-  return new byte[] {(byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value};
-}
-
-byte[] stringToBytes(String text) {
-  return text.getBytes();
-}
-
-byte[] JSONObjectToBytes(JSONObject json) {
-  ByteArrayOutputStream baos = new ByteArrayOutputStream();
-  try {
-    baos.write(json.toString().getBytes("UTF-8"));
-  }
-  catch (IOException e) {
-    e.printStackTrace();
-  }
-  return baos.toByteArray();
-}
-
-byte[] PImageToBytes(PImage img) {
-  ByteArrayOutputStream baos = new ByteArrayOutputStream();
-  try {
-    ImageIO.write((BufferedImage) img.getNative(), "jpg", baos);
-  }
-  catch (IOException e) {
-    e.printStackTrace();
-  }
-  return baos.toByteArray();
 }

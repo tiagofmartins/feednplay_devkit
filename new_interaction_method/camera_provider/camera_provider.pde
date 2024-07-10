@@ -1,14 +1,21 @@
-DataTransmitter dataTx;
+boolean makeUpData = true;
+boolean debug = false;
+
+DataTransmitter transmitter;
 
 void setup() {
   size(444, 222);
   frameRate(60);
-  dataTx = new DataTransmitter(this);
+  
+  transmitter = new DataTransmitter(this, 23000, makeUpData);
 }
 
 void draw() {
-  dataTx.run();
-  //if (frameCount % 60 == 0) {
+  transmitter.run();
+  
+  if (debug) {
+    image(transmitter.topCamera.getLastFrame(), 0, 0, 200, 200);
+  } else {
     background(200);
 
     textAlign(LEFT, TOP);
@@ -19,12 +26,19 @@ void draw() {
     text("Do NOT close this program.", 0, 0);
     textSize(20);
     translate(0, g.textSize * 2);
-    text("Requests received: " + dataTx.requestsReceived, 0, 0);
+    text("Requests received: " + transmitter.requestsReceived, 0, 0);
     translate(0, g.textSize * 2);
-    text("Requests replied: " + dataTx.requestsReplied, 0, 0);
-  //}
+    text("Requests replied: " + transmitter.requestsReplied, 0, 0);
+  }
+}
 
-  if (dataTx.cameraInput.lastFrame != null) {
-    image(dataTx.cameraInput.lastFrame, 0, 0, 200, 200);
+void keyPressed() {
+  if (key == ' ') {
+    debug = !debug;
+    if (debug) {
+      surface.setSize(1000, 750);
+    } else {
+      surface.setSize(400, 150);
+    }
   }
 }
