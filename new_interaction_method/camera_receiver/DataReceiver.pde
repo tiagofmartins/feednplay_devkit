@@ -108,7 +108,7 @@ class DataReceiver {
           data = ByteUtils.bytesToJSONObject(client.readBytes());
         } else if (dataClass == PImage.class) {
           //data = ByteUtils.bytesToPImage(bytes);
-          PImage dataTemp = ByteUtils.bytesToPImage2(parent, client.readBytes(), 1);
+          PImage dataTemp = ByteUtils.bytesToPImage2(parent, client.readBytes(), 3);
           if (dataTemp != null) {
             data =  dataTemp;
           }

@@ -83,7 +83,7 @@ class DataTransmitter {
         PImage img = topCamera.getLastFrame();
         if (img != null) {
           //data = PImageToBytes(img);
-          data = PImageToBytes2(img, 1);
+          data = PImageToBytes2(img, 3);
         }
       } else {
         println("Error: Unknown topic (" + topic + ")");

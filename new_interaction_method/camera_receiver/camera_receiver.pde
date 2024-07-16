@@ -8,7 +8,7 @@ PImage incomingData3 = null;
 JSONObject incomingData4 = null;
 
 void setup() {
-  size(444, 444);
+  size(1000, 800);
   frameRate(60);
   fill(255, 120, 0);
   textSize(50);

@@ -20,15 +20,7 @@ abstract class DataSource {
   }
   
   protected void controlStartAndStop() {
-    if (System.currentTimeMillis() - timeLastUse < 10000) {
-      if (!isCapturing()) {
-        startCapture();
-      }
-    } else {
-      if (isCapturing()) {
-        stopCapture();
-      }
-    }
+    
   }
   
   protected void updateTimeLastUse() {

@@ -6,15 +6,18 @@ DataTransmitter transmitter;
 void setup() {
   size(444, 222);
   frameRate(60);
-  
+
   transmitter = new DataTransmitter(this, 23000, makeUpData);
 }
 
 void draw() {
   transmitter.run();
-  
+
   if (debug) {
-    image(transmitter.topCamera.getLastFrame(), 0, 0, 200, 200);
+    PImage frame = transmitter.topCamera.getLastFrame();
+    if (frame != null) {
+      image(transmitter.topCamera.getLastFrame(), 0, 0, 200, 200);
+    }
   } else {
     background(200);
 
