@@ -6,53 +6,52 @@ import java.io.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
-
-
 class DataTransmitter {
   // https://github.com/processing/processing/tree/459853d0dcdf1e1648b1049d3fdbb4bf233fded8/java/libraries/net/src/processing/net
 
   private Server server;
-  private Map<String, ArrayList<Client>> clientsByTopic = new HashMap<String, ArrayList<Client>>();
+  private Map<String, ArrayList<Client>> clients = new HashMap<String, ArrayList<Client>>();
   public int requestsReceived = 0;
   public int requestsReplied = 0;
-  private TopCamera topCamera;
+  private InputCameraTop topCamera;
 
-  DataTransmitter(PApplet parent, int port, boolean makeUpData) {
+  DataTransmitter(PApplet parent, int port, boolean useRealData) {
     server = new Server(parent, port);
-    topCamera = new TopCamera(parent, makeUpData);
+    topCamera = new InputCameraTop(parent, useRealData);
   }
 
   public void run() {
     topCamera.run();
-    processIncomingRequests();
+    readRequests();
     replyToRequests();
   }
 
-  private void processIncomingRequests() {
+  private void readRequests() {
     // Go through available clients
     while (true) {
-      Client nextClient = server.available();
-      if (nextClient == null) {
+      
+      // Get next client available
+      Client client = server.available();
+      if (client == null) {
         break;
       }
 
-      // Read request text sent by current client
-      String receivedMessage = nextClient.readStringUntil('\n');
-      if (receivedMessage != null) {
-        receivedMessage = receivedMessage.trim();
+      // Read incoming message
+      String incomingMessage = client.readStringUntil('\n');
+      if (incomingMessage != null) {
+        incomingMessage = incomingMessage.trim();
       } else {
         continue;
       }
-
-      // Get topic requested by the client
-      //String receiverName = receivedMessage.split(">")[0];
-      String topic = receivedMessage.split(">")[1];
-
-      // Add client to waiting queue of the requested topic only if it is not already there
-      clientsByTopic.putIfAbsent(topic, new ArrayList<Client>());
-      ArrayList<Client> clientsWaiting = clientsByTopic.get(topic);
-      if (clientsWaiting.contains(nextClient) == false) {
-        clientsWaiting.add(nextClient);
+      
+      // Read topic
+      String topic = incomingMessage.split(">")[1];
+      //String clientName = incomingMessage.split(">")[0];
+      
+      // Add client to the list of clients that are requesting this topic
+      clients.putIfAbsent(topic, new ArrayList<Client>());
+      if (!clients.get(topic).contains(client)) {
+        clients.get(topic).add(client);
       }
       requestsReceived += 1;
     }
@@ -61,7 +60,7 @@ class DataTransmitter {
   private void replyToRequests() {
     // Iterate through each requested topic
     //for (Map.Entry e : clientsByTopic.entrySet()) {
-    Iterator<Map.Entry<String, ArrayList<Client>>> iterator = clientsByTopic.entrySet().iterator();
+    Iterator<Map.Entry<String, ArrayList<Client>>> iterator = clients.entrySet().iterator();
     while (iterator.hasNext()) {
       Map.Entry<String, ArrayList<Client>> entry = iterator.next();
       String topic = (String) entry.getKey();
@@ -70,20 +69,20 @@ class DataTransmitter {
       // Get data for current topic
       byte[] data = null;
       if (topic.equals("INT_RANDOM")) {
-        data = intToBytes(int(random(100)));
+        data = ByteConverter.intToBytes(int(random(100)));
       } else if (topic.equals("STR_RANDOM")) {
-        data = stringToBytes(getSaltString());
+        data = ByteConverter.stringToBytes("HELLO " + frameCount);
       } else if (topic.equals("JSON_TEST")) {
         JSONObject json = new JSONObject();
         json.setString("name", "Alice");
         json.setInt("age", int(random(1000)));
-        data = JSONObjectToBytes(json);
+        data = ByteConverter.JSONObjectToBytes(json);
       } else if (topic.equals("IMG_CAMTOP_RGB_720H")) {
         println(frameCount + " ----- IMG_CAMTOP_RGB_720H");
-        PImage img = topCamera.getLastFrame();
+        //PImage img = topCamera.getLastFrame();
+        PImage img = topCamera.getData("IMG_RGB");
         if (img != null) {
-          //data = PImageToBytes(img);
-          data = PImageToBytes2(img, 3);
+          data = ByteConverter.PImageToBytes(img, 3);
         }
       } else {
         println("Error: Unknown topic (" + topic + ")");
@@ -102,16 +101,4 @@ class DataTransmitter {
       }
     }
   }
-}
-
-protected String getSaltString() {
-  String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-  StringBuilder salt = new StringBuilder();
-  Random rnd = new Random();
-  while (salt.length() < 18) { // length of the random string.
-    int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-    salt.append(SALTCHARS.charAt(index));
-  }
-  String saltStr = salt.toString();
-  return saltStr;
 }
