@@ -1,5 +1,7 @@
 boolean useRealData = false;
 boolean debug = true;
+
+InputCameraTop camera;
 DataTransmitter transmitter;
 
 void settings() {
@@ -9,20 +11,23 @@ void settings() {
 
 void setup() {
   frameRate(60);
-  transmitter = new DataTransmitter(this, 23000, useRealData);
+  
+  camera = new InputCameraTop(this, useRealData);
+  transmitter = new DataTransmitter(this, camera, 23000);
 }
 
 void draw() {
-  transmitter.run();
+  camera.update();
+  transmitter.update();
 
   if (debug) {
-    PImage frame = transmitter.topCamera.getData("IMG_RGB");
-    if (frame != null) {
-      image(frame, 0, 0, 200, 200);
+    PImage img1 = camera.getTopic(Topic.IMG_CAMTOP_RGB);
+    if (img1 != null) {
+      image(img1, 0, 0, 200, 200);
     }
-    PImage frame2 = transmitter.topCamera.getData("IMG_CROP");
-    if (frame2 != null) {
-      image(frame2, mouseX, mouseY, 200, 200);
+    PImage img2 = camera.getTopic(Topic.IMG_CAMTOP_CROP_RGB);
+    if (img2 != null) {
+      image(img2, mouseX, mouseY, 200, 200);
     }
   } else {
     background(220);
@@ -31,13 +36,13 @@ void draw() {
     translate(width - height / 2, height / 2);
     rotate(frameCount / 20f);
     noFill();
-    stroke(transmitter.topCamera.isCapturing() ? color(100, 220, 100) : color(200));
+    stroke(camera.isCapturing() ? color(100, 220, 100) : color(200));
     strokeWeight(height * 0.1);
     arc(0, 0, height * 0.5, height * 0.5, 0, PI);
     pop();
     
     String text = "DO NOT CLOSE THIS PROGRAM.\n\n";
-    text += "Capturing: " + (transmitter.topCamera.isCapturing() ? "yes" : "no") + "\n";
+    text += "Capturing: " + (camera.isCapturing() ? "yes" : "no") + "\n";
     text += "Requests received: " + transmitter.requestsReceived + "\n";
     text += "Requests replied: " + transmitter.requestsReplied + "\n";
     fill(32);

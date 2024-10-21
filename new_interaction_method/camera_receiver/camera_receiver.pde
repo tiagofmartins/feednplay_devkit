@@ -7,7 +7,7 @@ void settings() {
 
 void setup() {
   frameRate(60);
-  receiver = new DataReceiver(this, 23000, Topic.IMG_CAMTOP_RGB_720H);
+  receiver = new DataReceiver(this, 23000, Topic.IMG_RGB);
   receiver.requestData();
 }
 

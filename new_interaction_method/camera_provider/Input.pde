@@ -9,9 +9,9 @@ abstract class Input {
   protected HashMap<String, Long> topicsAndTimes = new HashMap<String, Long>();
 
   Input(PApplet parent, boolean useRealData, long timePauseInput, long timePauseTopic) {
-    assert timePauseInput >= timePauseTopic;
     this.parent = parent;
     this.useRealData = useRealData;
+    assert timePauseInput >= timePauseTopic;
     this.timePauseInput = timePauseInput;
     this.timePauseTopic = timePauseTopic;
   }
@@ -24,7 +24,7 @@ abstract class Input {
   protected boolean needCalculation(String topic) {
     return System.currentTimeMillis() - topicsAndTimes.get(topic) < timePauseTopic;
   }
-  
+
   protected long getTimeLastUseOfAnyTopic() {
     long timeMax = 0;
     for (long t : topicsAndTimes.values()) {
@@ -34,8 +34,12 @@ abstract class Input {
     }
     return timeMax;
   }
-  
-  protected abstract <Any>Any getData(String topic);
+
+  protected <Any>Any getTopic(Topic topic) {
+    return getTopic(topic.name());
+  }
+
+  protected abstract <Any>Any getTopic(String topic);
 
   protected abstract void startCapture();
 
@@ -43,7 +47,7 @@ abstract class Input {
 
   protected abstract boolean isCapturing();
 
-  void run() {
+  public void update() {
     boolean capturing = isCapturing();
     boolean recentlyUsed = System.currentTimeMillis() - getTimeLastUseOfAnyTopic() < timePauseInput;
     if (capturing) {
@@ -55,6 +59,10 @@ abstract class Input {
         startCapture();
       }
     }
+  }
+
+  public boolean hasTopic(String topic) {
+    return topicsAndClasses.containsKey(topic);
   }
 
   public String getTopicsInfo() {

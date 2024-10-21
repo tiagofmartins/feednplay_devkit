@@ -8,7 +8,9 @@ import org.opencv.core.CvType;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.RotatedRect;
 
-
+enum Topic {
+  IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_DIFF, IMG_CAMTOP_RGB_720H
+}
 
 class InputCameraTop extends Input {
 
@@ -23,8 +25,12 @@ class InputCameraTop extends Input {
   PImage image = null;
   PImage imageCropped = null;
 
+
+
   InputCameraTop(PApplet parent, boolean useRealData) {
     super(parent, useRealData, 30000, 10000);
+
+
     addTopic("IMG_RGB", PImage.class);
     addTopic("IMG_CROP", PImage.class);
   }
@@ -65,8 +71,8 @@ class InputCameraTop extends Input {
     }
   }
 
-  void run() {
-    super.run();
+  void update() {
+    super.update();
 
     if (!isCapturing()) {
       return;
@@ -112,18 +118,28 @@ class InputCameraTop extends Input {
     opencv.toPImage(matCrop, imageCropped);
   }
 
-  <Any>Any getData(String topic) {
+  <Any>Any getTopic(String topic) {
     assert(topicsAndClasses.containsKey(topic));
     topicsAndTimes.put(topic, System.currentTimeMillis());
-    Object output = 2;
+    Object output = null;
     if (topic.equals("IMG_RGB")) {
       output = image;
     } else if (topic.equals("IMG_CROP")) {
       output = imageCropped;
-    } else {
-      assert false;
     }
-    return output == null ? null : (Any) topicsAndClasses.get(topic).cast(output);
+    return output == null ? null : (Any) output.getClass().cast(output);
+
+    /*assert(topicsAndClasses.containsKey(topic));
+     topicsAndTimes.put(topic, System.currentTimeMillis());
+     Object output = 2;
+     if (topic.equals("IMG_RGB")) {
+     output = image;
+     } else if (topic.equals("IMG_CROP")) {
+     output = imageCropped;
+     } else {
+     assert false;
+     }
+     return output == null ? null : (Any) topicsAndClasses.get(topic).cast(output);*/
   }
 }
 

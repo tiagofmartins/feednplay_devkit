@@ -4,7 +4,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 enum Topic {
-  IMG_CAMTOP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_DIFF, IMG_CAMTOP_RGB_720H
+  IMG_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_DIFF, IMG_CAMTOP_RGB_720H
 }
 
 class DataReceiver {
@@ -128,18 +128,9 @@ static {
   preffixDataClass.put("IMG", PImage.class);
 }
 
-
-/* § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- -------------------------------------------------------------------------------------------------
- Class with functions to convert different types of data to bytes and the other way around
- -------------------------------------------------------------------------------------------------
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § §
- § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § § */
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+// Encoder to convert different types of data to bytes
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 static class Encoder {
 
@@ -218,6 +209,10 @@ static class Encoder {
     return baos.toByteArray();
   }*/
 }
+
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+// Decoder to convert bytes to different types of data
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 static class Decoder {
 
