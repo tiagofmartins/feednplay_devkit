@@ -4,7 +4,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 enum Topic {
-  IMG_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_DIFF, IMG_CAMTOP_RGB_720H
+  IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_CROP_GRAY, IMG_CAMTOP_XYZ
 }
 
 class DataReceiver {

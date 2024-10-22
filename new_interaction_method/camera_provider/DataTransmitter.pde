@@ -7,7 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 class DataTransmitter {
-  
+
   private Server server;
   private Input input;
   private Map<String, ArrayList<Client>> clients = new HashMap<String, ArrayList<Client>>();
@@ -55,43 +55,43 @@ class DataTransmitter {
 
   private void replyToRequests() {
     // Iterate through each requested topic
-    //for (Map.Entry e : clientsByTopic.entrySet()) {
     Iterator<Map.Entry<String, ArrayList<Client>>> iterator = clients.entrySet().iterator();
     while (iterator.hasNext()) {
       Map.Entry<String, ArrayList<Client>> entry = iterator.next();
-      String topic = (String) entry.getKey();
 
-      byte[] data = null;
-      if (input.hasTopic(topic)) {
-        Object obj = input.getTopic(topic);
-        if (obj instanceof String) {
-          data = Encoder.stringToBytes((String) obj);
-        } else if (obj instanceof Integer) {
-          data = Encoder.integerToBytes((Integer) obj);
-        } else if (obj instanceof Float) {
-          data = Encoder.floatToBytes((Float) obj);
-        } else if (obj instanceof JSONObject) {
-          data = Encoder.jsonToBytes((JSONObject) obj);
-        } else if (obj instanceof PImage) {
-          data = Encoder.pimageToBytes((PImage) obj, 3);
-        } else {
-          System.err.println("ERROR - Unable to convert " + obj.getClass() + " to bytes");
-          System.exit(1);
-        }
+      // Get value for current topic
+      String topic = (String) entry.getKey();
+      Object value = input.getTopic(topic);
+
+      // Convert value to bytes based on its class
+      byte[] bytes = null;
+      if (value instanceof String) {
+        bytes = Encoder.stringToBytes((String) value);
+      } else if (value instanceof Integer) {
+        bytes = Encoder.integerToBytes((Integer) value);
+      } else if (value instanceof Float) {
+        bytes = Encoder.floatToBytes((Float) value);
+      } else if (value instanceof JSONObject) {
+        bytes = Encoder.jsonToBytes((JSONObject) value);
+      } else if (value instanceof PImage) {
+        bytes = Encoder.pimageToBytes((PImage) value, 3);
       } else {
-        System.err.println("ERROR - Unknown topic: " + topic);
+        System.err.println("ERROR - Unable to convert " + (value != null ? value.getClass(): null) + " to bytes");
+        //System.exit(1);
       }
 
-      if (data != null) {
+      // Send bytes to clients
+      if (bytes != null) {
         ArrayList<Client> clients = entry.getValue();
         for (Client c : clients) {
           if (c.active()) {
-            c.write(data);
+            c.write(bytes);
             requestsReplied += 1;
           }
         }
       }
-      
+
+      // Remove clients from queue
       iterator.remove();
     }
   }

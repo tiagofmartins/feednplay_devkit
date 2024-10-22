@@ -9,7 +9,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.RotatedRect;
 
 enum Topic {
-  IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_DIFF, IMG_CAMTOP_RGB_720H
+  IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_CROP_GRAY
 }
 
 class InputCameraTop extends Input {
@@ -19,20 +19,18 @@ class InputCameraTop extends Input {
   final PVector cropBottomRight = new PVector(0.83, 0.87);
   final PVector cropBottomLeft = new PVector(0.16, 0.882);
 
+  PApplet parent;
+  boolean useRealData;
   Capture camera; // https://github.com/processing/processing-video/blob/main/src/processing/video/Capture.java
   Movie video; // https://github.com/processing/processing-video/blob/main/src/processing/video/Movie.java
   OpenCV opencv = null; // https://github.com/atduskgreg/opencv-processing/tree/master/src/gab/opencv
   PImage image = null;
   PImage imageCropped = null;
 
-
-
   InputCameraTop(PApplet parent, boolean useRealData) {
-    super(parent, useRealData, 30000, 10000);
-
-
-    addTopic("IMG_RGB", PImage.class);
-    addTopic("IMG_CROP", PImage.class);
+    super(120000, 20000);
+    this.parent = parent;
+    this.useRealData = useRealData;
   }
 
   void startCapture() {
@@ -110,7 +108,7 @@ class InputCameraTop extends Input {
     //opencv.erode();
     //opencv.blur(6);
 
-    Mat matCrop = warpPerspective(opencv.getColor(), cropTopLeft, cropTopRight, cropBottomRight, cropBottomLeft);
+    Mat matCrop = unwarpImage(opencv.getColor(), cropTopLeft, cropTopRight, cropBottomRight, cropBottomLeft);
 
     if (imageCropped == null) {
       imageCropped = createImage(matCrop.cols(), matCrop.rows(), ARGB);
@@ -119,32 +117,41 @@ class InputCameraTop extends Input {
   }
 
   <Any>Any getTopic(String topic) {
-    assert(topicsAndClasses.containsKey(topic));
-    topicsAndTimes.put(topic, System.currentTimeMillis());
-    Object output = null;
-    if (topic.equals("IMG_RGB")) {
-      output = image;
-    } else if (topic.equals("IMG_CROP")) {
-      output = imageCropped;
+    Enum e;
+    try {
+      e = Topic.valueOf(topic);
     }
-    return output == null ? null : (Any) output.getClass().cast(output);
+    catch (IllegalArgumentException ignored) {
+      System.err.println("Invalid topic: " + topic);
+      return null;
+    }
 
-    /*assert(topicsAndClasses.containsKey(topic));
-     topicsAndTimes.put(topic, System.currentTimeMillis());
-     Object output = 2;
-     if (topic.equals("IMG_RGB")) {
-     output = image;
-     } else if (topic.equals("IMG_CROP")) {
-     output = imageCropped;
-     } else {
-     assert false;
-     }
-     return output == null ? null : (Any) topicsAndClasses.get(topic).cast(output);*/
+    Object value = null;
+    if (e == Topic.IMG_CAMTOP_RGB) {
+      value = image;
+    } else if (e == Topic.IMG_CAMTOP_CROP_RGB) {
+      value = imageCropped;
+    } else {
+      System.err.println("Invalid topic: " + topic);
+    }
+
+    updateLastTimeUse(topic);
+
+    if (value != null) {
+      return (Any) value.getClass().cast(value);
+    } else {
+      return null;
+    }
   }
 }
 
 
-Mat warpPerspective(Mat m, PVector tl, PVector tr, PVector br, PVector bl) {
+
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+// Unwarping image
+// ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+Mat unwarpImage(Mat m, PVector tl, PVector tr, PVector br, PVector bl) {
   Point[] srcCorners = new Point[]{
     new Point(tl.x * m.cols(), tl.y * m.rows()), new Point(tr.x * m.cols(), tr.y * m.rows()),
     new Point(br.x * m.cols(), br.y * m.rows()), new Point(bl.x * m.cols(), bl.y * m.rows()),
@@ -167,24 +174,4 @@ Mat warpPerspective(Mat m, PVector tl, PVector tr, PVector br, PVector bl) {
   Imgproc.warpPerspective(m, unWarpedMarker, transform, new Size(dstWidth, dstHeight));
 
   return unWarpedMarker;
-}
-
-
-/**
- * Function to convert Mat to PImage
- */
-PImage MatToPImage(Mat mat) {
-  PImage img = createImage(mat.width(), mat.height(), RGB);
-  int numPixels = mat.width() * mat.height();
-  byte[] data = new byte[numPixels * 3];
-  mat.get(0, 0, data);
-  img.loadPixels();
-  for (int i = 0; i < numPixels; i++) {
-    int r = data[i * 3] & 0xFF;
-    int g = data[i * 3 + 1] & 0xFF;
-    int b = data[i * 3 + 2] & 0xFF;
-    img.pixels[i] = color(r, g, b);
-  }
-  img.updatePixels();
-  return img;
 }
