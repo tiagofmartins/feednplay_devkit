@@ -1,11 +1,108 @@
+import processing.net.*;
+import java.util.Map;
+import java.util.Iterator;
 import java.nio.ByteBuffer;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+
+class FnpDataServer {
+
+  private Server server;
+  private FnpDataSource source;
+  private Map<String, ArrayList<Client>> clients = new HashMap<String, ArrayList<Client>>();
+  public int requestsReceived = 0;
+  public int requestsReplied = 0;
+
+  FnpDataServer(PApplet parent, FnpDataSource source, int port) {
+    this.server = new Server(parent, port);
+    this.source = source;
+  }
+
+  public void update() {
+    readIncomingRequests();
+    replyToRequests();
+  }
+
+  private void readIncomingRequests() {
+    // Go through available clients
+    while (true) {
+      Client client = server.available();
+      if (client == null) {
+        break;
+      }
+
+      // Read incoming message
+      String incomingMessage = client.readStringUntil('\n');
+      if (incomingMessage != null) {
+        incomingMessage = incomingMessage.trim();
+      } else {
+        continue;
+      }
+
+      // Read topic
+      String topic = incomingMessage.split(">")[1];
+      //String clientName = incomingMessage.split(">")[0];
+
+      // Add client to the list of clients that are requesting this topic
+      clients.putIfAbsent(topic, new ArrayList<Client>());
+      if (!clients.get(topic).contains(client)) {
+        clients.get(topic).add(client);
+      }
+      requestsReceived += 1;
+    }
+  }
+
+  private void replyToRequests() {
+    // Iterate through each requested topic
+    Iterator<Map.Entry<String, ArrayList<Client>>> iterator = clients.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<String, ArrayList<Client>> entry = iterator.next();
+
+      // Get value for current topic
+      String topic = (String) entry.getKey();
+      Object value = source.getTopic(topic);
+
+      // Convert value to bytes based on its class
+      byte[] bytes = null;
+      if (value instanceof String) {
+        bytes = Encoder.stringToBytes((String) value);
+      } else if (value instanceof Integer) {
+        bytes = Encoder.integerToBytes((Integer) value);
+      } else if (value instanceof Float) {
+        bytes = Encoder.floatToBytes((Float) value);
+      } else if (value instanceof JSONObject) {
+        bytes = Encoder.jsonToBytes((JSONObject) value);
+      } else if (value instanceof PImage) {
+        bytes = Encoder.pimageToBytes((PImage) value, 3);
+      } else {
+        System.err.println("ERROR - Invalid data class: " + (value != null ? value.getClass() : null));
+        //System.exit(1);
+      }
+
+      // Send bytes to clients
+      if (bytes != null) {
+        ArrayList<Client> clients = entry.getValue();
+        for (Client c : clients) {
+          if (c.active()) {
+            c.write(bytes);
+            requestsReplied += 1;
+          }
+        }
+      }
+
+      // Remove clients from queue
+      iterator.remove();
+    }
+  }
+}
 
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 // Encoder to convert different types of data to bytes
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 static class Encoder {
-  
+
   static byte[] stringToBytes(String text) {
     return text.getBytes();
   }
@@ -160,49 +257,3 @@ static class Decoder {
    return pimg;
    }*/
 }
-
-
-/*static class TopicHelper {
-
-  static HashMap<String, Class<?>> preffixDataClass = new HashMap<String, Class<?>>();
-
-  static {
-    preffixDataClass.put("STR", String.class);
-    preffixDataClass.put("INT", Integer.class);
-    preffixDataClass.put("FLOAT", Float.class);
-    preffixDataClass.put("JSON", JSONObject.class);
-    preffixDataClass.put("IMG", PImage.class);
-  }
-
-  static String getPreffix(String topic) {
-    return topic.split("_")[0];
-  }
-
-  static Class<?> getClass(String topic) {
-    String p = getPreffix(topic);
-    return preffixDataClass.get(p);
-  }
-
-  static byte[] valueToBytes(String topic, Object value) {
-    Class c = getClass(topic);
-    if (c == String.class) {
-      return Encoder.stringToBytes((String) value);
-    } else if (c == Integer.class) {
-      return Encoder.integerToBytes((Integer) value);
-    } else if (c == Float.class) {
-      return Encoder.floatToBytes((Float) value);
-    } else if (c == JSONObject.class) {
-      return Encoder.jsonToBytes((JSONObject) value);
-    } else if (c == PImage.class) {
-      return Encoder.pimageToBytes((PImage) value, 3);
-    } else {
-      return null;
-    }
-  }
-
-  static <Any>Any bytesToValue(String topic, byte[] bytes) {
-    //return output == null ? null : (Any) topicsAndClasses.get(topic).cast(output);
-    return null;
-  }
-}
-*/

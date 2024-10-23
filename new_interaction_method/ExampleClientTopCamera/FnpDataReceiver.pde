@@ -2,32 +2,46 @@ import processing.net.*;
 import java.io.*;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.nio.ByteBuffer;
 
 enum Topic {
   IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_CROP_GRAY, IMG_CAMTOP_XYZ
 }
 
-class DataReceiver {
+class FnpDataReceiver {
 
   private final String SERVER_ADDRESS = "127.0.0.1";
 
   private PApplet parent;
   private int port;
   private Topic topic;
-  private String id;
   private Class<?> dataClass;
+  private String id;
   private Client client = null;
   private Object data = null;
   private long timeLastRequestSent = -1;
 
-  DataReceiver(PApplet parent, int port, Topic topic) {
+  FnpDataReceiver(PApplet parent, int port, Topic topic) {
     this.parent = parent;
     this.port = port;
     this.topic = topic;
 
     // Set class for incoming data based on the preffix of the topic
-    String topicPreffix = topic.name().split("_")[0];
-    this.dataClass = preffixDataClass.get(topicPreffix);
+    String preffix = topic.name().split("_")[0];
+    if (preffix.equals("INT")) {
+      dataClass = Integer.class;
+    } else if (preffix.equals("FLOAT")) {
+      dataClass = Float.class;
+    } else if (preffix.equals("STR")) {
+      dataClass = String.class;
+    } else if (preffix.equals("JSON")) {
+      dataClass = JSONObject.class;
+    } else if (preffix.equals("IMG")) {
+      dataClass = PImage.class;
+    } else {
+      System.err.println("ERROR - Invalid topic preffix (" + topic + ")");
+      System.exit(1);
+    }
 
     // Set ID string using the name of the program, thread ID, and topic
     String programName = new File(parent.sketchPath("")).getName();
@@ -60,7 +74,7 @@ class DataReceiver {
 
     // Reconnect to server and send new new data quest if no data is received for some time
     if (System.currentTimeMillis() - timeLastRequestSent > 5000) {
-      println("Data reception timeout");
+      System.err.println("ERROR - Data reception timeout");
       client = null; // Force the creation of new connection
       timeLastRequestSent = -1; // Force the sending of new data request
       requestData();
@@ -75,13 +89,13 @@ class DataReceiver {
       byte[] incomingBytes = client.readBytes();
       try {
         if (dataClass == Integer.class) {
-          data = Decoder.toInt(incomingBytes);
+          data = Decoder.bytesToInt(incomingBytes);
         } else if (dataClass == Float.class) {
-          data = Decoder.toFloat(incomingBytes);
+          data = Decoder.bytesToFloat(incomingBytes);
         } else if (dataClass == JSONObject.class) {
-          data = Decoder.toJSONObject(incomingBytes);
+          data = Decoder.bytesToJSON(incomingBytes);
         } else if (dataClass == PImage.class) {
-          PImage dataTemp = Decoder.toPImage(parent, incomingBytes, 3);
+          PImage dataTemp = Decoder.bytesToPImage(parent, incomingBytes, 3);
           if (dataTemp != null) {
             data =  dataTemp;
           }
@@ -92,7 +106,7 @@ class DataReceiver {
         return true; // Return true, meaning new data is available
       }
       catch (Exception e) {
-        println("Unable to parse incoming data:\n" + e);
+        System.err.println("ERROR - Unable to parse incoming data:\n" + e);
       }
     }
 
@@ -118,36 +132,28 @@ class DataReceiver {
   }
 }
 
-static HashMap<String, Class<?>> preffixDataClass = new HashMap<String, Class<?>>();
-
-static {
-  preffixDataClass.put("STR", String.class);
-  preffixDataClass.put("INT", int.class);
-  preffixDataClass.put("FLOAT", float.class);
-  preffixDataClass.put("JSON", JSONObject.class);
-  preffixDataClass.put("IMG", PImage.class);
-}
-
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 // Encoder to convert different types of data to bytes
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 static class Encoder {
 
-  static byte[] get(String text) {
+  static byte[] stringToBytes(String text) {
     return text.getBytes();
   }
 
-  static byte[] get(int value) {
-    return new byte[] {(byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value};
+  static byte[] integerToBytes(Integer value) {
+    //return new byte[] {(byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value};
+    return ByteBuffer.allocate(4).putInt(value).array();
   }
 
-  static byte[] get(float value) {
-    int intBits = Float.floatToIntBits(value);
-    return new byte[] {(byte)(intBits >> 24), (byte)(intBits >> 16), (byte)(intBits >> 8), (byte)(intBits)};
+  static byte[] floatToBytes(Float value) {
+    //int intBits = Float.floatToIntBits(value);
+    //return new byte[] {(byte)(intBits >> 24), (byte)(intBits >> 16), (byte)(intBits >> 8), (byte)(intBits)};
+    return ByteBuffer.allocate(4).putFloat(value).array();
   }
 
-  static byte[] get(JSONObject json) {
+  static byte[] jsonToBytes(JSONObject json) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       baos.write(json.toString().getBytes("UTF-8"));
@@ -158,7 +164,7 @@ static class Encoder {
     return baos.toByteArray();
   }
 
-  static byte[] get(PImage img, int channels) {
+  static byte[] pimageToBytes(PImage img, int channels) {
     assert channels == 1 || channels == 3;
 
     // Create array of bytes
@@ -193,21 +199,21 @@ static class Encoder {
     return bytes;
   }
 
-  /*static byte[] get(PImage img, float compression) throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-    ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-    ImageWriteParam param = writer.getDefaultWriteParam();
-    param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-    param.setCompressionQuality(compression);
-
-    // ImageIO.write((BufferedImage) img.getNative(), "jpg", baos);
-    writer.setOutput(new MemoryCacheImageOutputStream(baos));
-
-    writer.write(null, new IIOImage((BufferedImage) img.getNative(), null, null), param);
-
-    return baos.toByteArray();
-  }*/
+  /*static byte[] pimageJPEGToBytes(PImage img, float compression) throws IOException {
+   ByteArrayOutputStream baos = new ByteArrayOutputStream();
+   
+   ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+   ImageWriteParam param = writer.getDefaultWriteParam();
+   param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+   param.setCompressionQuality(compression);
+   
+   // ImageIO.write((BufferedImage) img.getNative(), "jpg", baos);
+   writer.setOutput(new MemoryCacheImageOutputStream(baos));
+   
+   writer.write(null, new IIOImage((BufferedImage) img.getNative(), null, null), param);
+   
+   return baos.toByteArray();
+   }*/
 }
 
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -216,20 +222,20 @@ static class Encoder {
 
 static class Decoder {
 
-  static String toString(byte[] bytes) {
+  static String bytesToString(byte[] bytes) {
     return new String(bytes);
   }
 
-  static int toInt(byte[] bytes) {
+  static Integer bytesToInt(byte[] bytes) {
     return (bytes[0] << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);
   }
 
-  static float toFloat(byte[] bytes) {
+  static Float bytesToFloat(byte[] bytes) {
     int intBits = bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
     return Float.intBitsToFloat(intBits);
   }
 
-  static JSONObject toJSONObject(byte[] bytes) {
+  static JSONObject bytesToJSON(byte[] bytes) {
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
     JSONObject json = null;
     byte[] buffer = new byte[bytes.length];
@@ -244,7 +250,7 @@ static class Decoder {
     return json;
   }
 
-  static PImage toPImage(PApplet parent, byte[] bytes, int channels) {
+  static PImage bytesToPImage(PApplet parent, byte[] bytes, int channels) {
     //System.gc();
 
     assert channels == 1 || channels == 3;
@@ -278,7 +284,7 @@ static class Decoder {
     return img;
   }
 
-  /*static PImage toPImageJPEG(byte[] imgbytes) throws IOException, NullPointerException {
+  /*static PImage bytesToPImageJPEG(byte[] imgbytes) throws IOException, NullPointerException {
    BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(imgbytes));
    PImage pimg = new PImage(bimg.getWidth(), bimg.getHeight(), RGB);
    bimg.getRGB(0, 0, pimg.width, pimg.height, pimg.pixels, 0, pimg.width);

@@ -1,5 +1,5 @@
-DataReceiver receiver;
-PImage cameraImage = null;
+FnpDataReceiver receiver;
+PImage image = null;
 
 void settings() {
   size(1000, 800);
@@ -7,19 +7,19 @@ void settings() {
 
 void setup() {
   frameRate(60);
-  receiver = new DataReceiver(this, 23000, Topic.IMG_CAMTOP_XYZ);
+  receiver = new FnpDataReceiver(this, 23000, Topic.IMG_CAMTOP_RGB);
   receiver.requestData();
 }
 
 void draw() {
   if (receiver.newDataAvailable()) {
-    cameraImage = receiver.getData();
+    image = receiver.getData();
     receiver.requestData();
   }
 
-  background(0);
-  if (cameraImage != null) {
-    image(cameraImage, 0, 0);
+  background(255);
+  if (image != null) {
+    image(image, 0, 0);
   } else {
     textAlign(CENTER, CENTER);
     text("No data received yet", width / 2, height / 2);

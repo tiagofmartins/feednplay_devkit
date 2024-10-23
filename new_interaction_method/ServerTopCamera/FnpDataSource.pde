@@ -1,32 +1,27 @@
-abstract class Input {
+abstract class FnpDataSource {
 
-  private long timePauseInput; // Pause input if no topic has been requested for x milliseconds
-  private long timePauseTopic; // Pause topic calculation if it has not been requested for x milliseconds
+  private long timePauseSource; // Time (ms) to pause this source after any topic was used for the last time
+  private long timePauseTopic; // Time (ms) to pause the calculation of a topic after it was used for the last time
   private Map<String, Long> timesLastUse = new HashMap<String, Long>();
 
-  Input(long timePauseInput, long timePauseTopic) {
-    assert timePauseInput >= timePauseTopic;
-    this.timePauseInput = timePauseInput;
+  FnpDataSource(long timePauseSource, long timePauseTopic) {
+    assert timePauseSource >= timePauseTopic;
+    this.timePauseSource = timePauseSource;
     this.timePauseTopic = timePauseTopic;
   }
 
   public void update() {
-    long timeLastUse = 0;
+    boolean pause = true;
     for (long t : timesLastUse.values()) {
-      if (t > timeLastUse) {
-        timeLastUse = t;
+      if (System.currentTimeMillis() - t < timePauseSource) {
+        pause = false;
+        break;
       }
     }
-    boolean recentlyUsed = System.currentTimeMillis() - timeLastUse < timePauseInput;
-    boolean capturing = isCapturing();
-    if (capturing) {
-      if (!recentlyUsed) {
-        stopCapture();
-      }
-    } else {
-      if (recentlyUsed) {
-        startCapture();
-      }
+    if (pause && isCapturing()) {
+      stopCapture();
+    } else if (!pause && !isCapturing()) {
+      startCapture();
     }
   }
 

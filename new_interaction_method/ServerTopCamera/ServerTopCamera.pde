@@ -1,8 +1,8 @@
 boolean useRealData = false;
 boolean debug = true;
 
-InputCameraTop camera;
-DataTransmitter transmitter;
+FnpDataSource camera;
+FnpDataServer server;
 
 void settings() {
   size(1000, 800);
@@ -11,15 +11,16 @@ void settings() {
 
 void setup() {
   frameRate(60);
-
-  camera = new InputCameraTop(this, useRealData);
-  transmitter = new DataTransmitter(this, camera, 23000);
+  
+  camera = new FnpTopCamera(this, useRealData);
+  server = new FnpDataServer(this, camera, 23000);
 }
 
 void draw() {
   camera.update();
-  transmitter.update();
+  server.update();
   
+  background(220);
   if (debug) {
     drawDebugScreen();
   } else {
@@ -50,8 +51,6 @@ void drawDebugScreen() {
 }
 
 void drawDefaultScreen() {
-  background(220);
-
   push();
   translate(width - height / 2, height / 2);
   rotate(frameCount / 20f);
@@ -63,8 +62,8 @@ void drawDefaultScreen() {
 
   String text = "DO NOT CLOSE THIS PROGRAM.\n\n";
   text += "Capturing: " + (camera.isCapturing() ? "yes" : "no") + "\n";
-  text += "Requests received: " + transmitter.requestsReceived + "\n";
-  text += "Requests replied: " + transmitter.requestsReplied + "\n";
+  text += "Requests received: " + server.requestsReceived + "\n";
+  text += "Requests replied: " + server.requestsReplied + "\n";
   fill(32);
   textSize(20);
   textAlign(LEFT, TOP);

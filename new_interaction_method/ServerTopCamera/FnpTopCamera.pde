@@ -12,23 +12,23 @@ enum Topic {
   IMG_CAMTOP_RGB, IMG_CAMTOP_CROP_RGB, IMG_CAMTOP_GRAY, IMG_CAMTOP_CROP_GRAY
 }
 
-class InputCameraTop extends Input {
+class FnpTopCamera extends FnpDataSource {
 
-  final PVector cropTopLeft = new PVector(0.12, 0.32);
-  final PVector cropTopRight = new PVector(0.87, 0.30);
-  final PVector cropBottomRight = new PVector(0.83, 0.87);
-  final PVector cropBottomLeft = new PVector(0.16, 0.882);
+  private final PVector CROP_TOP_LEFT = new PVector(0.12, 0.32);
+  private final PVector CROP_TOP_RIGHT = new PVector(0.87, 0.30);
+  private final PVector CROP_BOTTOM_RIGHT = new PVector(0.83, 0.87);
+  private final PVector CROP_BOTTOM_LEFT = new PVector(0.16, 0.882);
 
-  PApplet parent;
-  boolean useRealData;
-  Capture camera; // https://github.com/processing/processing-video/blob/main/src/processing/video/Capture.java
-  Movie video; // https://github.com/processing/processing-video/blob/main/src/processing/video/Movie.java
-  OpenCV opencv = null; // https://github.com/atduskgreg/opencv-processing/tree/master/src/gab/opencv
-  PImage image = null;
-  PImage imageCropped = null;
+  private PApplet parent;
+  private boolean useRealData;
+  private Capture camera = null;
+  private Movie video = null;
+  private OpenCV opencv = null;
+  private PImage image = null;
+  private PImage imageCropped = null;
 
-  InputCameraTop(PApplet parent, boolean useRealData) {
-    super(120000, 20000);
+  FnpTopCamera(PApplet parent, boolean useRealData) {
+    super(60000, 20000);
     this.parent = parent;
     this.useRealData = useRealData;
   }
@@ -108,7 +108,7 @@ class InputCameraTop extends Input {
     //opencv.erode();
     //opencv.blur(6);
 
-    Mat matCrop = unwarpImage(opencv.getColor(), cropTopLeft, cropTopRight, cropBottomRight, cropBottomLeft);
+    Mat matCrop = unwarpImage(opencv.getColor(), CROP_TOP_LEFT, CROP_TOP_RIGHT, CROP_BOTTOM_RIGHT, CROP_BOTTOM_LEFT);
 
     if (imageCropped == null) {
       imageCropped = createImage(matCrop.cols(), matCrop.rows(), ARGB);
@@ -170,8 +170,8 @@ Mat unwarpImage(Mat m, PVector tl, PVector tr, PVector br, PVector bl) {
   MatOfPoint2f srcMarker = new MatOfPoint2f(srcCorners);
   MatOfPoint2f dstMarker = new MatOfPoint2f(dstCorners);
   Mat transform = Imgproc.getPerspectiveTransform(srcMarker, dstMarker);
-  Mat unWarpedMarker = new Mat(dstWidth, dstHeight, CvType.CV_8UC1);
-  Imgproc.warpPerspective(m, unWarpedMarker, transform, new Size(dstWidth, dstHeight));
+  Mat unwarpedMarker = new Mat(dstWidth, dstHeight, CvType.CV_8UC1);
+  Imgproc.warpPerspective(m, unwarpedMarker, transform, new Size(dstWidth, dstHeight));
 
-  return unWarpedMarker;
+  return unwarpedMarker;
 }
