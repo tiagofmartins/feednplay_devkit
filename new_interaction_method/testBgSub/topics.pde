@@ -33,9 +33,10 @@ class TopicsManager {
       return null;
     }
   }
-  
+
   long getTimeLastUse(String topic) {
-    assert lastUse.containsKey(topic) : "Invalid topic: " + topic;
+    assert lastUse.containsKey(topic) :
+    "Invalid topic: " + topic;
     return lastUse.get(topic);
   }
 
@@ -69,7 +70,7 @@ class TopicsManager {
     }
     return false;
   }
-  
+
   void setRecentUseLimit(long recentUseLimit) {
     this.recentUseLimit = recentUseLimit;
   }

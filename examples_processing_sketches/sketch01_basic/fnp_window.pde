@@ -21,8 +21,8 @@ boolean fnpSizeCalled = false;
 void fnpSize(int x, int y, int w, int h, String renderer, boolean undecorated) {
   // Check if this function was called in settings() and not in setup()
   boolean calledFromSettings = false;
-  StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-  for (StackTraceElement element : stackTraceElements) {
+  StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+  for (StackTraceElement element : stackTrace) {
     if (element.getMethodName().equals("settings")) {
       calledFromSettings = true;
       break;

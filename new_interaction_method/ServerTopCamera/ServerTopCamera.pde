@@ -11,7 +11,6 @@ void settings() {
 
 void setup() {
   frameRate(60);
-  
   camera = new FnpTopCamera(this, useRealData);
   server = new FnpDataServer(this, camera, 23000);
 }
@@ -19,8 +18,6 @@ void setup() {
 void draw() {
   camera.update();
   server.update();
-  
-  background(220);
   if (debug) {
     drawDebugScreen();
   } else {
@@ -40,6 +37,8 @@ void keyReleased() {
 }
 
 void drawDebugScreen() {
+  background(220);
+
   PImage img1 = camera.getTopic(Topic.IMG_CAMTOP_RGB);
   if (img1 != null) {
     image(img1, 0, 0, 200, 200);
@@ -51,6 +50,8 @@ void drawDebugScreen() {
 }
 
 void drawDefaultScreen() {
+  background(220);
+
   push();
   translate(width - height / 2, height / 2);
   rotate(frameCount / 20f);

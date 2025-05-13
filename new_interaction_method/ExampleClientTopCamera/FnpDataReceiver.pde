@@ -14,11 +14,13 @@ class FnpDataReceiver {
 
   private PApplet parent;
   private int port;
-  private Topic topic;
-  private Class<?> dataClass;
-  private String id;
   private Client client = null;
+  
+  private Topic topic;
   private Object data = null;
+  private Class<?> dataClass;
+  
+  private String requestMessage;
   private long timeLastRequestSent = -1;
 
   FnpDataReceiver(PApplet parent, int port, Topic topic) {
@@ -39,14 +41,14 @@ class FnpDataReceiver {
     } else if (preffix.equals("IMG")) {
       dataClass = PImage.class;
     } else {
-      System.err.println("ERROR - Invalid topic preffix (" + topic + ")");
+      System.err.println("ERROR - Unable to determine data class for topic: " + topic);
       System.exit(1);
     }
 
-    // Set ID string using the name of the program, thread ID, and topic
+    // Setup request message using the name of the program, thread ID, and topic
     String programName = new File(parent.sketchPath("")).getName();
     String threadId = String.valueOf(Thread.currentThread().getId());
-    this.id = programName + "-" + threadId + ">" + topic.name();
+    requestMessage = programName + "-" + threadId + ">" + topic.name();
   }
 
   private void checkConnection() {
@@ -60,7 +62,7 @@ class FnpDataReceiver {
     // Send data request only if we are not waiting for one sent previously
     if (timeLastRequestSent == -1) {
       checkConnection();
-      client.write(this.id);
+      client.write(requestMessage);
       client.write('\n');
       timeLastRequestSent = System.currentTimeMillis();
     }
@@ -198,22 +200,6 @@ static class Encoder {
     // Return bytes
     return bytes;
   }
-
-  /*static byte[] pimageJPEGToBytes(PImage img, float compression) throws IOException {
-   ByteArrayOutputStream baos = new ByteArrayOutputStream();
-   
-   ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-   ImageWriteParam param = writer.getDefaultWriteParam();
-   param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-   param.setCompressionQuality(compression);
-   
-   // ImageIO.write((BufferedImage) img.getNative(), "jpg", baos);
-   writer.setOutput(new MemoryCacheImageOutputStream(baos));
-   
-   writer.write(null, new IIOImage((BufferedImage) img.getNative(), null, null), param);
-   
-   return baos.toByteArray();
-   }*/
 }
 
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -283,12 +269,4 @@ static class Decoder {
     img.updatePixels();
     return img;
   }
-
-  /*static PImage bytesToPImageJPEG(byte[] imgbytes) throws IOException, NullPointerException {
-   BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(imgbytes));
-   PImage pimg = new PImage(bimg.getWidth(), bimg.getHeight(), RGB);
-   bimg.getRGB(0, 0, pimg.width, pimg.height, pimg.pixels, 0, pimg.width);
-   pimg.updatePixels();
-   return pimg;
-   }*/
 }

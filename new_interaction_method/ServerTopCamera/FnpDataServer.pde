@@ -163,22 +163,6 @@ static class Encoder {
     // Return bytes
     return bytes;
   }
-
-  /*static byte[] pimageJPEGToBytes(PImage img, float compression) throws IOException {
-   ByteArrayOutputStream baos = new ByteArrayOutputStream();
-   
-   ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
-   ImageWriteParam param = writer.getDefaultWriteParam();
-   param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-   param.setCompressionQuality(compression);
-   
-   // ImageIO.write((BufferedImage) img.getNative(), "jpg", baos);
-   writer.setOutput(new MemoryCacheImageOutputStream(baos));
-   
-   writer.write(null, new IIOImage((BufferedImage) img.getNative(), null, null), param);
-   
-   return baos.toByteArray();
-   }*/
 }
 
 // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -248,12 +232,4 @@ static class Decoder {
     img.updatePixels();
     return img;
   }
-
-  /*static PImage bytesToPImageJPEG(byte[] imgbytes) throws IOException, NullPointerException {
-   BufferedImage bimg = ImageIO.read(new ByteArrayInputStream(imgbytes));
-   PImage pimg = new PImage(bimg.getWidth(), bimg.getHeight(), RGB);
-   bimg.getRGB(0, 0, pimg.width, pimg.height, pimg.pixels, 0, pimg.width);
-   pimg.updatePixels();
-   return pimg;
-   }*/
 }
